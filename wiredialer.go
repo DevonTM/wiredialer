@@ -13,6 +13,7 @@ import (
 	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/tun"
 	"golang.zx2c4.com/wireguard/tun/netstack"
+	"gvisor.dev/gvisor/pkg/tcpip/adapters/gonet"
 
 	"github.com/botanica-consulting/wiredialer/internal/config"
 )
@@ -29,6 +30,30 @@ func (d *WireDialer) Dial(network, address string) (net.Conn, error) {
 
 func (d *WireDialer) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
 	return d.tnet.DialContext(ctx, network, address)
+}
+
+func (d *WireDialer) DialPing(lAddress, rAddress *netstack.PingAddr) (*netstack.PingConn, error) {
+	return d.tnet.DialPing(lAddress, rAddress)
+}
+
+func (d *WireDialer) ListenPing(address *netstack.PingAddr) (*netstack.PingConn, error) {
+	return d.tnet.ListenPing(address)
+}
+
+func (d *WireDialer) ListenTCP(address *net.TCPAddr) (*gonet.TCPListener, error) {
+	return d.tnet.ListenTCP(address)
+}
+
+func (d *WireDialer) ListenUDP(address *net.UDPAddr) (*gonet.UDPConn, error) {
+	return d.tnet.ListenUDP(address)
+}
+
+func (d *WireDialer) LookupHost(host string) ([]string, error) {
+	return d.tnet.LookupHost(host)
+}
+
+func (d *WireDialer) LookupContextHost(ctx context.Context, host string) ([]string, error) {
+	return d.tnet.LookupContextHost(ctx, host)
 }
 
 func NewDialerFromFile(path string) (*WireDialer, error) {
@@ -55,6 +80,9 @@ func NewDialerFromConfiguration(config_reader io.Reader) (*WireDialer, error) {
 	}
 	dev := device.NewDevice(tun, conn.NewDefaultBind(), device.NewLogger(device.LogLevelError, ""))
 	err = dev.IpcSet(ipcConfig)
+	if err != nil {
+		log.Panic(err)
+	}
 	err = dev.Up()
 	if err != nil {
 		log.Panic(err)
