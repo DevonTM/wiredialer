@@ -38,6 +38,14 @@ func (d *WireDialer) DialContext(ctx context.Context, network, address string) (
 	return d.tnet.DialContext(ctx, network, address)
 }
 
+func (d *WireDialer) DialTCP(address *net.TCPAddr) (*gonet.TCPConn, error) {
+	return d.tnet.DialTCP(address)
+}
+
+func (d *WireDialer) DialUDP(laddr *net.UDPAddr, raddr *net.UDPAddr) (*gonet.UDPConn, error) {
+	return d.tnet.DialUDP(laddr, raddr)
+}
+
 func (d *WireDialer) DialPing(lAddress, rAddress *netstack.PingAddr) (*netstack.PingConn, error) {
 	return d.tnet.DialPing(lAddress, rAddress)
 }
