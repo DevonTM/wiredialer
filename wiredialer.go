@@ -3,6 +3,7 @@ package wiredialer
 import (
 	"io"
 	"log"
+	"net/netip"
 	"os"
 
 	"net"
@@ -22,6 +23,11 @@ type WireDialer struct {
 	tun    tun.Device
 	tnet   *netstack.Net
 	device *device.Device
+	dns    []netip.Addr
+}
+
+func (d *WireDialer) GetDNS() []netip.Addr {
+	return d.dns
 }
 
 func (d *WireDialer) Dial(network, address string) (net.Conn, error) {
@@ -92,5 +98,6 @@ func NewDialerFromConfiguration(config_reader io.Reader) (*WireDialer, error) {
 		tun:    tun,
 		tnet:   tnet,
 		device: dev,
+		dns:    dns_addresses,
 	}, nil
 }
